@@ -4,7 +4,9 @@ import random
 import colorsys
 import settings
 import json
-
+import os
+os.environ['SDL_AUDIODRIVER'] = 'dsp'
+os.environ['SDL_VIDEO_CENTERED'] = '1'
 # -------- Helper functions ---------
 
 def make2DArray(cols, rows):
@@ -21,7 +23,7 @@ def withinBounds(i, side):
     return i >= 0 and i <= side-1
 
 
-w = 10
+w = 20
 hueValue = 200
 hueSteps = 0.1
 hueLimit = 20
@@ -44,7 +46,7 @@ def setup():
     # initialize and prepare screen
     pg.init()
 
-    surface = pg.display.set_mode((800, 480))
+    surface = pg.display.set_mode((800, 480), pg.FULLSCREEN)
     
     cols = surface.get_width() // w
     rows = surface.get_height() // w
@@ -85,7 +87,7 @@ def mousePressed(grid,mouseX, mouseY, cols, rows, hueValue):
     mouseCol = math.floor(mouseX / w)
     mouseRow = math.floor(mouseY / w)
 
-    matrix = 3
+    matrix = 2
     extention = math.floor(matrix/2)
     for i in range(-extention, extention):
         for j in range(-extention, extention):
@@ -106,9 +108,9 @@ def loop(surface: pg.surface.Surface, cols, rows, grid):
     for i in range (0, cols):
         for e in range(0, rows):
             if grid[i][e] == 0:
-                color = pg.color.Color(255, 255, 255)
+                color = (255, 255, 255)
             else:
-                color = pg.color.Color(hsv2rgb(grid[i][e]/100,0.35,0.63))
+                color = hsv2rgb(grid[i][e]/100,0.35,0.63)
             
             x = i * w
             y = e * w
