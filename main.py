@@ -2,6 +2,8 @@ import pygame as pg
 import math
 import random
 import colorsys
+import settings
+import json
 
 # -------- Helper functions ---------
 
@@ -20,8 +22,25 @@ def withinBounds(i, side):
 
 
 w = 10
+hueValue = 200
+hueSteps = 0.1
+hueLimit = 20
+hueMin = 12
+
+def defaultConf(d,f):
+    d["hue_value"] = 200
+    d["hue_steps"] = 0.1
+    d["hue_limit"] = 20
+    d["hue_min"] = 12
+    f.seek(0)
+    f.write(json.dumps(d))
+    f.truncate()
 
 def setup():
+    global hueValue
+    global hueSteps
+    global hueLimit
+    global hueMin
     # initialize and prepare screen
     pg.init()
 
@@ -33,7 +52,16 @@ def setup():
     grid = make2DArray(cols, rows)
 
     clock = pg.time.Clock()
-    hueValue = 200
+
+    with open('settings.json', 'r+') as f:
+        d = json.load(f)
+        if len(d) < 4:
+            defaultConf(d,f)
+        else:
+            hueValue = d["hue_value"]
+            hueSteps = d["hue_steps"]
+            hueLimit = d["hue_limit"]
+            hueMin = d["hue_min"]
     done = False
     while not done:
         grid = loop(surface, cols, rows, grid)
@@ -42,9 +70,15 @@ def setup():
             if e.type == pg.QUIT or (e.type == pg.KEYUP and e.key == pg.K_ESCAPE):
                 done = 1
                 break
+            elif e.type == pg.MOUSEBUTTONDOWN:
+                if (e.pos[0] < 22 and e.pos[1] < 22):
+                    settings.setup()
+                    done = 1
+                    break
             elif e.type == pg.MOUSEMOTION:
                 hueValue = mousePressed(grid, e.pos[0], e.pos[1], cols, rows, hueValue)
-        clock.tick(50)
+        if not done:
+            clock.tick(50)
     pg.quit()
 
 def mousePressed(grid,mouseX, mouseY, cols, rows, hueValue):
@@ -60,9 +94,10 @@ def mousePressed(grid,mouseX, mouseY, cols, rows, hueValue):
             if random.randint(0,1) < 0.75:
                 if withinBounds(col, cols) and withinBounds(row, rows):
                     grid[col][row] = hueValue
-    newValue = hueValue + 0.01
-    if hueValue >= 360:
-        newValue = 1
+
+    newValue = hueValue + hueSteps
+    if hueValue >= hueLimit:
+        newValue = hueMin
 
     return newValue
 
@@ -71,10 +106,9 @@ def loop(surface: pg.surface.Surface, cols, rows, grid):
     for i in range (0, cols):
         for e in range(0, rows):
             if grid[i][e] == 0:
-                color = pg.color.Color(0, 0, 0)
+                color = pg.color.Color(255, 255, 255)
             else:
-                # print(hsv2rgb(grid[i][e]/100,1,1))
-                color = pg.color.Color(hsv2rgb(grid[i][e]/100,1,1))
+                color = pg.color.Color(hsv2rgb(grid[i][e]/100,0.35,0.63))
             
             x = i * w
             y = e * w
@@ -106,9 +140,12 @@ def loop(surface: pg.surface.Surface, cols, rows, grid):
                     nextGrid[i - direc][e + 1] = currentState
                 else:
                     nextGrid[i][e] = currentState
+    setting = pg.image.load("./image/gear.png")
+    surface.blit(setting, (2, 2))
     return nextGrid
 
 
 if __name__ == "__main__":
     setup()
     pg.quit()
+    exit(0)
