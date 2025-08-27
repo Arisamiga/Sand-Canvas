@@ -6,7 +6,7 @@ import settings
 import json
 import os
 os.environ['SDL_AUDIODRIVER'] = 'dsp'
-os.environ['SDL_VIDEO_CENTERED'] = '1'
+
 # -------- Helper functions ---------
 
 def make2DArray(cols, rows):
@@ -46,7 +46,7 @@ def setup():
     # initialize and prepare screen
     pg.init()
 
-    surface = pg.display.set_mode((800, 480), pg.FULLSCREEN)
+    surface = pg.display.set_mode((800, 480))
     
     cols = surface.get_width() // w
     rows = surface.get_height() // w

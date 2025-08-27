@@ -5,7 +5,7 @@ import json
 from collections import defaultdict
 import os
 os.environ['SDL_AUDIODRIVER'] = 'dsp'
-os.environ['SDL_VIDEO_CENTERED'] = '1'
+
 items = defaultdict(list)
 
 def makeFieldWithIncreasements(text, pos, surface, variable, steps):
@@ -49,7 +49,7 @@ def setupSettings(surface: pg.surface.Surface):
 def setup():
     # initialize and prepare screen
     pg.init()
-    surface = pg.display.set_mode((800, 480), pg.FULLSCREEN)
+    surface = pg.display.set_mode((800, 480))
 
 
     global hueValue
